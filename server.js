@@ -1,68 +1,102 @@
-#!/bin/env node
-//  OpenShift sample Node application
 
-var express = require('express');
-var fs      = require('fs');
-
-//  Local cache for static content [fixed and loaded at startup]
-var zcache = { 'index.html': '' };
-zcache['index.html'] = fs.readFileSync('./index.html'); //  Cache index.html
-
-// Create "express" server.
-var app  = express.createServer();
+/**
+ * Module dependencies.
+ */
 
 
-/*  =====================================================================  */
-/*  Setup route handlers.  */
-/*  =====================================================================  */
 
-// Handler for GET /health
-app.get('/health', function(req, res){
-    res.send('1');
+var express = require('express'),
+    jsdom = require('jsdom'),
+    request = require('request'),
+    url = require('url'),
+	async = require('async'),
+	app = module.exports = express.createServer()
+
+app.configure(function(){
+  app.set('port', process.env.OPENSHIFT_INTERNAL_PORT || 3000);
+  app.set('host', process.env.OPENSHIFT_INTERNAL_IP || "localhost");
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(__dirname + '/public'));
 });
 
-// Handler for GET /asciimo
-app.get('/asciimo', function(req, res){
-    var link="https://a248.e.akamai.net/assets.github.com/img/d84f00f173afcf3bc81b4fad855e39838b23d8ff/687474703a2f2f696d6775722e636f6d2f6b6d626a422e706e67";
-    res.send("<html><body><img src='" + link + "'></body></html>");
+app.configure('development', function(){
+  app.use(express.errorHandler());
 });
 
-// Handler for GET /
-app.get('/', function(req, res){
-    res.send(zcache['index.html'], {'Content-Type': 'text/html'});
+app.get('/studio', function(req, res) {
+
+
+	request({uri: 'https://www3.student.liu.se/portal/login?user=' + req.query["user"] + '&pass=' + req.query["pass"]},
+			function(err, response, body) {
+				
+				if(err)
+					console.log('Request error.');
+				
+				request({uri: 'https://www3.student.liu.se/portal/registreringar/tidigare?termin=Alla', encoding: 'utf-8'},
+					function(err, response, body) {
+						var self = this;
+						self.courses = new Array();
+						
+						if(err)
+							console.log('Request error.');
+							
+						jsdom.env({
+							html: body,
+							scripts: ['http://code.jquery.com/jquery-1.6.min.js']
+							}, function(err, window){
+
+									var $ = window.jQuery,
+										$semesterRegistrationTable = $('table[bgcolor="#ffffcc"][border="0"]');
+										
+									$semesterRegistrationTable.each( function( i, item ) { // For every registration table
+									
+										var $year = $(item).find("th:eq(0)").text().substr(-8,7),
+										
+											$semester = $(item).find("td:eq(1)").text().substr(-1);
+											
+										$(item).find("tr:gt(1)")
+											   .each( function(j, courseRow) { // For every course
+													var $code = $(courseRow).children("td:eq(1)").text(),
+														$name = $(courseRow).children("td:eq(2)").text(),
+														$points = $(courseRow).children("td:eq(3)").text().substr(0,2).replace(".","");
+											   
+													//console.log( "Code: " + $code );
+													//console.log( "Name: " + $name );
+													//console.log( "Points: " + $points );
+													
+													self.courses.push({
+														year: $year,
+														semester: $semester,
+														code: $code,
+														name: $name,
+														points: $points
+													});
+										});
+									});
+									
+									console.log( self.courses );
+									res.end( JSON.stringify( self.courses, null, 4 ) );
+									//res.render('layout', {
+									//	title: 'StudIO',
+									//	courses: self.courses
+									//});
+									
+						});
+					});
+			});
+	
+	
 });
 
 
-//  Get the environment variables we need.
-var ipaddr  = process.env.OPENSHIFT_INTERNAL_IP;
-var port    = process.env.OPENSHIFT_INTERNAL_PORT || 8080;
+console.log("Starting server on IP " + app.get('host') );
+console.log("Port " + app.get('port'));
 
-if (typeof ipaddr === "undefined") {
-   console.warn('No OPENSHIFT_INTERNAL_IP environment variable');
-}
 
-//  terminator === the termination handler.
-function terminator(sig) {
-   if (typeof sig === "string") {
-      console.log('%s: Received %s - terminating Node server ...',
-                  Date(Date.now()), sig);
-      process.exit(1);
-   }
-   console.log('%s: Node server stopped.', Date(Date.now()) );
-}
-
-//  Process on exit and signals.
-process.on('exit', function() { terminator(); });
-
-['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT', 'SIGBUS',
- 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGPIPE', 'SIGTERM'
-].forEach(function(element, index, array) {
-    process.on(element, function() { terminator(element); });
-});
-
-//  And start the app on that interface (and port).
-app.listen(port, ipaddr, function() {
-   console.log('%s: Node server started on %s:%d ...', Date(Date.now() ),
-               ipaddr, port);
-});
-
+app.listen( app.get('port'), app.get('host') );
