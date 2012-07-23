@@ -9,6 +9,6 @@
     "express": "3.0.0beta7",
     "jade": "*",
     "jsdom": "0.2.15",
-    "request": 2.9.203"
+    "request": "2.9.203"
   }
 }
