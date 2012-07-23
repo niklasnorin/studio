@@ -9,12 +9,12 @@ var express = require('express'),
     jsdom = require('jsdom'),
     request = require('request'),
     url = require('url'),
-	async = require('async'),
+//	async = require('async'),
 	app = module.exports = express.createServer()
 
 app.configure(function(){
   app.set('port', process.env.OPENSHIFT_INTERNAL_PORT || 3000);
-  app.set('host', process.env.OPENSHIFT_INTERNAL_IP || "localhost");
+  app.set('host', process.env.OPENSHIFT_INTERNAL_IP || "192.168.1.6");
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
