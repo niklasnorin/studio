@@ -6,14 +6,15 @@
 
 
 var express = require('express'),
-	app = module.exports = express.createServer();
+    mongo = require('mongoskin'),
+	  app = module.exports = express.createServer();
 	
 	
 	
 
 app.configure(function(){
   app.set('port', process.env.OPENSHIFT_INTERNAL_PORT || 3000);
-  app.set('host', process.env.OPENSHIFT_INTERNAL_IP || "192.168.1.6");
+  app.set('host', process.env.OPENSHIFT_INTERNAL_IP || '192.168.1.6');
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
@@ -38,7 +39,7 @@ var routes = require('./routes')(app);
 var routes = require('./routes/api')(app);
 
 
-console.log("Starting server on IP " + app.get('host') );
-console.log("Port " + app.get('port'));
+console.log('Starting server on IP ' + app.get('host') );
+console.log('Port ' + app.get('port'));
 
 app.listen( app.get('port'), app.get('host') );
