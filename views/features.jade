@@ -1,0 +1,40 @@
+extends layout
+
+block append scripts
+    script(type='text/javascript', src='/javascripts/bootstrap-button.js')
+    script(type='text/javascript', src='/javascripts/feature.js')
+
+    
+mixin vote-control( feature )
+  div(class='btn-group feature-id-#{feature.id}')
+    a.btn.btn-danger.toggle.feature-vote-down(href='#')
+      i.icon-minus.icon-white
+      
+    a(class='btn feature-votes disabled feature-id-#{feature.id}', href='#')
+      b #{feature.votes}
+    a.btn.btn-success.toggle.feature-vote-up(href='#')
+      i.icon-plus.icon-white  
+
+      
+block content
+  
+  .container
+    .row
+      .span8.offset2
+        
+        table.table.table-striped
+          thead
+            tr
+              th Röster
+              th Namn
+              th Beskrivning
+              th URL
+          tbody
+            each feature in features
+              tr 
+                td 
+                  mixin vote-control( feature )
+                td #{feature.name}
+                td #{feature.description}
+                td 
+                  a(href='http://studio-tracker.niklasnorin.se/issues/#{feature.id}') Feature #{feature.id}
