@@ -12,10 +12,10 @@ module.exports = function(app){
 		}
     });
 	
-	app.get('/', function(req, res){
+	app.get('/api', function(req, res){
         res.render('index.jade',
 			{
-				title: 'Index'
+				title: 'API Index'
 			});
     });
     
