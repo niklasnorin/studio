@@ -8,7 +8,7 @@ module.exports = function(app){
 		
 	app.get('/courses', function(req, res){
 	
-		db.collection('courses').find().toArray(function (err, courses) {
+		db.collection('courses').find({},{sort: 'code'}).toArray(function (err, courses) {
 	
 		res.render('courses.jade',
 			{
