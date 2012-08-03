@@ -33,6 +33,8 @@ module.exports = function(app){
 										
 									$semesterRegistrationTable.each( function( i, item ) { // For every registration table
 									
+										console.log( i );
+									
 										var $year = $(item).find("th:eq(0)").text().substr(-8,7),
 										
 											$semester = $(item).find("td:eq(1)").text().substr(-1);
@@ -43,9 +45,9 @@ module.exports = function(app){
 														$name = $(courseRow).children("td:eq(2)").text(),
 														$points = $(courseRow).children("td:eq(3)").text().substr(0,2).replace(".","");
 											   
-													//console.log( "Code: " + $code );
-													//console.log( "Name: " + $name );
-													//console.log( "Points: " + $points );
+													console.log( "Code: " + $code );
+													console.log( "Name: " + $name );
+													console.log( "Points: " + $points );
 													
 													self.courses.push({
 														year: $year,
@@ -57,8 +59,10 @@ module.exports = function(app){
 										});
 									});
 									
+									
 									console.log( self.courses );
 									res.end( JSON.stringify( self.courses, null, 4 ) );
+									
 									//res.render('layout', {
 									//	title: 'StudIO',
 									//	courses: self.courses

@@ -1,49 +1,21 @@
+var fs = require('fs'),
+      jsdom = require('jsdom'),
+      request = require('request'),
+      url = require('url'),
+      db= require('../modules/persist');
 
 module.exports = function(app){
-
-  var courses = [
-			{
-				code: 'TNA007',
-				name: 'Vektoranalys',
-				points: 6,
-				scheduled: [
-					{
-						year: 2012,
-						semester: 'VT',
-						period: [1]
-					},
-					{
-						year: 2011,
-						semester: 'VT',
-						period: [1]
-					}
-				]
-			},
-			{
-				code: 'TNG032',
-				name: 'Transformteori',
-				points: 6,
-				scheduled: [
-					{
-						year: 2012,
-						semester: 'HT',
-						period: [2]
-					},
-					{
-						year: 2011,
-						semester: 'HT',
-						period: [2]
-					}
-				]
-			}
-		];
-
+		
 	app.get('/courses', function(req, res){
-        res.render('courses.jade',
+	
+		db.collection('courses').find({},{sort: 'code'}).toArray(function (err, courses) {
+	
+		res.render('courses.jade',
 			{
 				title: 'courses',
-        courses: courses
+				courses: courses
 			});
-    });
+		});
+	});
     
 }

@@ -12,9 +12,17 @@ block content
               th Kurskod
               th Namn
               th Poäng
+              th Betyg
           tbody
             each course in courses
               tr 
-                td #{course.code}
+                td 
+                  a(href='courses/#{course.code}') #{course.code}
                 td #{course.name}
                 td #{course.points}
+                td.course-rating-column
+                  i.icon-star
+                  i.icon-star
+                  i.icon-star
+                  i.icon-star-empty
+                  i.icon-star-empty
