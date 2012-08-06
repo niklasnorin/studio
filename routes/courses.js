@@ -2,7 +2,8 @@ var fs = require('fs'),
       jsdom = require('jsdom'),
       request = require('request'),
       url = require('url'),
-      db= require('../modules/persist');
+      db= require('../modules/persist'),
+      encoder = require('../scripts/encoder');
 
 module.exports = function(app){
 		
@@ -15,6 +16,25 @@ module.exports = function(app){
 				title: 'courses',
 				courses: courses
 			});
+		});
+	});
+  
+  
+  app.get('/course/:code', function(req, res){
+	
+		db.collection('courses').findOne({code: req.params.code}, function (err, course) {
+    
+      if (!err && course) {
+      
+        res.render('course.jade',
+          {
+            title: course.code,
+            course: course
+          });
+      }
+      else
+        res.status(404);
+        res.end();
 		});
 	});
     

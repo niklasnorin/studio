@@ -17,7 +17,7 @@ block content
             each course in courses
               tr 
                 td 
-                  a(href='courses/#{course.code}') #{course.code}
+                  a(href='/course/#{course.code}') #{course.code}
                 td #{course.name}
                 td #{course.points}
                 td.course-rating-column
