@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  
+  .container
+    .row
+      .span8.offset2
+        
+        h1 #{course.code} - #{course.name}
+        
+        dl.dl-horizontal
+          dt Poäng
+          dd #{course.points}
+          br
+          dt Nivå
+          dd #{course.advancementLevel}
+          br
+          dt Huvudområde
+          dd #{course.mainFieldOfStudies}
+          br
+          dt Hemsida
+          dd 
+            a(href="#{course.website}") #{course.website}
+          br
+          dt Innehåll
+          dd !{course.courseContent}
+          br
+          dt Mål
+          dd !{course.aim}
